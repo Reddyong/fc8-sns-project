@@ -1,4 +1,6 @@
-package com.fc8.snsproject.domain.user.dto;
+package com.fc8.snsproject.domain.user.dto.response;
+
+import com.fc8.snsproject.domain.user.dto.UserDto;
 
 public record UserJoinResponse(
         Long id,
