@@ -12,6 +12,7 @@ import org.hibernate.annotations.Where;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+// TODO : @Where 을 사용하는 방법을 현재 hibernate 방법에 맞게 고쳐보기
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
