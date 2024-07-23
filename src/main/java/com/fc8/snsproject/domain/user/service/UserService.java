@@ -1,5 +1,7 @@
 package com.fc8.snsproject.domain.user.service;
 
+import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.user.dto.UserDto;
 import com.fc8.snsproject.domain.user.dto.UserJoinResponse;
 import com.fc8.snsproject.domain.user.entity.User;
 import com.fc8.snsproject.domain.user.repository.UserRepository;
@@ -13,24 +15,25 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // TODO : implement
-    public UserJoinResponse join(String username, String password) {
+    public UserDto join(String username, String password) {
         // 회원가입 하려는 username 으로 회원가입한 user 가 존재하는지
-        User user = userRepository.findByUsername(username).orElseThrow(SnsApplicationException::new);
+        userRepository.findByUsername(username).ifPresent(it -> {
+            throw new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated", username));
+        });
 
         // 회원가입 진행 = user 를 등록
-        userRepository.save(new User());
+        User savedUser = userRepository.save(User.of(username, password));
 
-        return UserJoinResponse.of(1L, "");
+        return UserDto.from(savedUser);
     }
 
     public String login(String username, String password) {
         // 회원가입 여부 체크
-        User user = userRepository.findByUsername(username).orElseThrow(SnsApplicationException::new);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, ""));
 
         // 비밀번호 체크
         if (!user.getPassword().equals(password)) {
-            throw new SnsApplicationException();
+            throw new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, "");
         }
 
         // 토큰 생성
