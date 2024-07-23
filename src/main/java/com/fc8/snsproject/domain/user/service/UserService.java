@@ -2,11 +2,11 @@ package com.fc8.snsproject.domain.user.service;
 
 import com.fc8.snsproject.common.ErrorCode;
 import com.fc8.snsproject.domain.user.dto.UserDto;
-import com.fc8.snsproject.domain.user.dto.UserJoinResponse;
 import com.fc8.snsproject.domain.user.entity.User;
 import com.fc8.snsproject.domain.user.repository.UserRepository;
 import com.fc8.snsproject.exception.SnsApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public UserDto join(String username, String password) {
         // 회원가입 하려는 username 으로 회원가입한 user 가 존재하는지
@@ -21,8 +22,10 @@ public class UserService {
             throw new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME, String.format("%s is duplicated", username));
         });
 
+        String encodedPassword = passwordEncoder.encode(password);
+
         // 회원가입 진행 = user 를 등록
-        User savedUser = userRepository.save(User.of(username, password));
+        User savedUser = userRepository.save(User.of(username, encodedPassword));
 
         return UserDto.from(savedUser);
     }
