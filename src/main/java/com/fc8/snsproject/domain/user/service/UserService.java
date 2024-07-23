@@ -8,6 +8,7 @@ import com.fc8.snsproject.exception.SnsApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -16,6 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    @Transactional
     public UserDto join(String username, String password) {
         // 회원가입 하려는 username 으로 회원가입한 user 가 존재하는지
         userRepository.findByUsername(username).ifPresent(it -> {
