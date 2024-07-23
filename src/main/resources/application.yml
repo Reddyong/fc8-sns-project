@@ -17,3 +17,7 @@ spring:
     password: reddyong1234!@#$
     driver-class-name: org.postgresql.Driver
 
+
+jwt:
+  secret.key: fastcampus.sns-project-2024.secret_key
+  token.expired-time-ms: 2592000000

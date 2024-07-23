@@ -2,9 +2,10 @@ package com.fc8.snsproject.domain.user.controller;
 
 import com.fc8.snsproject.common.Response;
 import com.fc8.snsproject.domain.user.dto.UserDto;
-import com.fc8.snsproject.domain.user.dto.UserJoinRequest;
-import com.fc8.snsproject.domain.user.dto.UserJoinResponse;
-import com.fc8.snsproject.domain.user.entity.User;
+import com.fc8.snsproject.domain.user.dto.request.UserJoinRequest;
+import com.fc8.snsproject.domain.user.dto.request.UserLoginRequest;
+import com.fc8.snsproject.domain.user.dto.response.UserJoinResponse;
+import com.fc8.snsproject.domain.user.dto.response.UserLoginResponse;
 import com.fc8.snsproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,11 @@ public class UserController {
     }
 
     @PostMapping(path = "/login")
-    public void login() {
+    public Response<UserLoginResponse> login(
+            @RequestBody UserLoginRequest userLoginRequest
+    ) {
+        String token = userService.login(userLoginRequest.username(), userLoginRequest.password());
 
+        return Response.success(UserLoginResponse.of(token));
     }
 }
