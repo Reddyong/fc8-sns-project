@@ -1,10 +1,10 @@
 package com.fc8.snsproject.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fc8.snsproject.domain.user.dto.UserJoinRequest;
-import com.fc8.snsproject.domain.user.dto.UserJoinResponse;
-import com.fc8.snsproject.domain.user.dto.UserLoginRequest;
-import com.fc8.snsproject.domain.user.entity.User;
+import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.user.dto.UserDto;
+import com.fc8.snsproject.domain.user.dto.request.UserJoinRequest;
+import com.fc8.snsproject.domain.user.dto.request.UserLoginRequest;
 import com.fc8.snsproject.domain.user.service.UserService;
 import com.fc8.snsproject.exception.SnsApplicationException;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ public class UserControllerTest {
         String password = "1234";
 
         // when, then
-        when(userService.join(username, password)).thenReturn(mock(UserJoinResponse.class));
+        when(userService.join(username, password)).thenReturn(mock(UserDto.class));
 
         mockMvc.perform(post("/api/v1/users/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ public class UserControllerTest {
         String password = "1234";
 
         // when, then
-        when(userService.join(username, password)).thenThrow(new SnsApplicationException());
+        when(userService.join(username, password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME));
 
         mockMvc.perform(post("/api/v1/users/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ public class UserControllerTest {
         String password = "1234";
 
         // when, then
-        when(userService.login(username, password)).thenThrow(new SnsApplicationException());
+        when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.USER_NOT_FOUND));
 
         mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +115,7 @@ public class UserControllerTest {
         String password = "1111";
 
         // when, then
-        when(userService.login(username, password)).thenThrow(new SnsApplicationException());
+        when(userService.login(username, password)).thenThrow(new SnsApplicationException(ErrorCode.INVALID_PASSWORD));
 
         mockMvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -1,4 +1,4 @@
-package com.fc8.snsproject.domain.user.dto;
+package com.fc8.snsproject.domain.user.dto.request;
 
 public record UserJoinRequest(
         String username,
