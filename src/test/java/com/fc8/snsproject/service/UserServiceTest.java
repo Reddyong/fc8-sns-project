@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
@@ -29,6 +30,9 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private BCryptPasswordEncoder passwordEncoder;
+
     @DisplayName(value = "회원가입 성공")
     @Test
     void givenUsernameAndPassword_whenRegistering_thenRegistersUser() {
@@ -38,6 +42,7 @@ public class UserServiceTest {
 
         // when
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(password)).thenReturn("encrypt_password");
         when(userRepository.save(any())).thenReturn(Optional.of(mock(UserEntityFixture.get(username, password))));
 
         // then
@@ -54,6 +59,8 @@ public class UserServiceTest {
 
         // when
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(mock(UserEntityFixture.get(username, password))));
+        when(passwordEncoder.encode(password)).thenReturn("encrypt_password");
+        when(userRepository.save(any())).thenReturn(Optional.of(mock(UserEntityFixture.get(username, password))));
 
         // then
         assertThrows(SnsApplicationException.class, () -> userService.join(username, password));
