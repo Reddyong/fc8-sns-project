@@ -53,4 +53,11 @@ public class UserService {
         // 토큰 생성
         return JwtTokenUtils.generateToken(username, secretKey, expiredTimeMs);
     }
+
+    public UserDto loadByUsername(String username) {
+        return userRepository.findByUsername(username).map(UserDto::from).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", username))
+        );
+    }
+
 }
