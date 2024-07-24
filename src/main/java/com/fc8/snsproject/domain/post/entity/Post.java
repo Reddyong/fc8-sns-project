@@ -10,12 +10,13 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 // TODO : @Where 을 사용하는 방법을 현재 hibernate 방법에 맞게 고쳐보기
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE user SET deleted_at = NOW() where id=?")
+@SQLDelete(sql = "UPDATE posts SET deleted_at = NOW() where id=?")
 @Where(clause = "deleted_at is NULL")
 @Table(name = "posts")
 @Entity
@@ -65,5 +66,15 @@ public class Post {
 
     public static Post of(Long id, User user, String title, String body) {
         return new Post(id, user, title, body);
+    }
+
+    @PrePersist
+    void registeredAt() {
+        this.registeredAt = Timestamp.from(Instant.now());
+    }
+
+    @PreUpdate
+    void updatedAt() {
+        this.updatedAt = Timestamp.from(Instant.now());
     }
 }
