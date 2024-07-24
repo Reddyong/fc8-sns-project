@@ -41,4 +41,14 @@ public class PostController {
 
         return Response.success(postModifyResponse);
     }
+
+    @DeleteMapping(path = "/{post-id}")
+    public Response<String> delete(
+            @PathVariable(name = "post-id") Long postId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        postService.delete(postId, userDetails.getUsername());
+
+        return Response.success("delete success");
+    }
 }
