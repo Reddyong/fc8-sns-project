@@ -132,7 +132,7 @@ public class PostControllerTest {
     }
 
     @DisplayName(value = "포스트 수정 실패 - 수정하려는 글이 없는 경우")
-    @WithAnonymousUser
+    @WithMockUser
     @Test
     void givenPostTitleAndBody_whenUpdatingPostButNoneExistingPost_thenReturnsNotFoundResponse() throws Exception {
         // given
