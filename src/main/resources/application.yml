@@ -19,5 +19,5 @@ spring:
 
 
 jwt:
-  secret.key: fastcampus.sns-project-2024.secret_key
+  secret.key: fastcampus.sns-project-2024.secret_key.myReddyongSecretKey!@#$1234
   token.expired-time-ms: 2592000000

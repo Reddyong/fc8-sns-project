@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -24,12 +25,15 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
     private String title;
 
+    @Setter
     @Column(columnDefinition = "TEXT")
     private String body;
 
@@ -41,4 +45,14 @@ public class Post {
 
     @Column(name = "deleted_at")
     private Timestamp deletedAt;
+
+    public Post(User user, String title, String body) {
+        this.user = user;
+        this.title = title;
+        this.body = body;
+    }
+
+    public static Post of(User user, String title, String body) {
+        return new Post(user, title, body);
+    }
 }
