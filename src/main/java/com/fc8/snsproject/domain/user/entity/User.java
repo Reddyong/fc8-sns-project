@@ -50,8 +50,18 @@ public class User {
         this.password = password;
     }
 
+    public User(Long id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+    }
+
     public static User of(String username, String password) {
         return new User(username, password);
+    }
+
+    public static User of(Long id, String username, String password) {
+        return new User(id, username, password);
     }
 
     @PrePersist
