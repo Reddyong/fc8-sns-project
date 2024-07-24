@@ -5,8 +5,12 @@ import com.fc8.snsproject.common.ErrorCode;
 import com.fc8.snsproject.domain.post.dto.PostDto;
 import com.fc8.snsproject.domain.post.dto.request.PostCreateRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostModifyRequest;
+import com.fc8.snsproject.domain.post.entity.Post;
 import com.fc8.snsproject.domain.post.service.PostService;
+import com.fc8.snsproject.domain.user.entity.User;
 import com.fc8.snsproject.exception.SnsApplicationException;
+import com.fc8.snsproject.fixture.PostEntityFixture;
+import com.fc8.snsproject.fixture.UserEntityFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +23,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -145,6 +147,66 @@ public class PostControllerTest {
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(PostModifyRequest.of(title, body)))
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName(value = "포스트 삭제 성공")
+    @WithMockUser
+    @Test
+    void givenPostId_whenDeletingPost_thenReturnsOKResponse() throws Exception {
+        // given
+
+        // when, then
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName(value = "포스트 삭제 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    @Test
+    void givenPostId_whenDeletingPostWithNoLogin_thenReturnsUnAuthorizedResponse() throws Exception {
+        // given
+
+        // when, then
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "포스트 삭제 실패 - 로그인한 사용자와 삭제할 포스트의 작성자가 다른 경우")
+    @WithMockUser
+    @Test
+    void givenPostIdAndDifferentUser_whenDeletingPost_thenReturnsUnAuthorizedResponse() throws Exception {
+        // given
+
+        // when, then
+        doThrow(new SnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(anyLong(), anyString());
+
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "포스트 삭제 실패 - 삭제할 포스트가 존재하지 않는 경우")
+    @WithMockUser
+    @Test
+    void givenNoneExistingPostId_whenDeletingPost_thenReturnsNotFoundResponse() throws Exception {
+        // given
+
+        // when, then
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(anyLong(), anyString());
+
+        mockMvc.perform(delete("/api/v1/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isNotFound());
 
