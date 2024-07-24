@@ -1,6 +1,7 @@
 package com.fc8.snsproject.service;
 
 import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.post.dto.PostDto;
 import com.fc8.snsproject.domain.post.entity.Post;
 import com.fc8.snsproject.domain.post.repository.PostRepository;
 import com.fc8.snsproject.domain.post.service.PostService;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -38,11 +40,12 @@ public class PostServiceTest {
         // given
         String title = "title";
         String body = "body";
-        String username = "hong";
+        String username = "test";
+        User user = User.of(username, "");
 
         // when
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(User.of(username, "")));
-        when(postRepository.save(any())).thenReturn(any(Post.class));
+        when(userRepository.findByUsername(eq(username))).thenReturn(Optional.of(User.of(username, "")));
+        when(postRepository.save(any())).thenReturn(Post.of(user, title, body));
 
         // then
         assertDoesNotThrow(() -> postService.create(title, body, username));
@@ -56,9 +59,11 @@ public class PostServiceTest {
         String title = "title";
         String body = "body";
         String username = "hong";
+        User user = User.of(username, "");
 
         // when
-        when(userRepository.findByUsername(username)).thenThrow(SnsApplicationException.class);
+        when(userRepository.findByUsername(eq(username))).thenReturn(Optional.empty());
+        when(postRepository.save(any())).thenReturn(Post.of(user, title, body));
 
         // then
         SnsApplicationException snsApplicationException = assertThrows(SnsApplicationException.class,
