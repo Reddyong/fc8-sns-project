@@ -52,7 +52,18 @@ public class Post {
         this.body = body;
     }
 
+    public Post(Long id, User user, String title, String body) {
+        this.id = id;
+        this.user = user;
+        this.title = title;
+        this.body = body;
+    }
+
     public static Post of(User user, String title, String body) {
         return new Post(user, title, body);
+    }
+
+    public static Post of(Long id, User user, String title, String body) {
+        return new Post(id, user, title, body);
     }
 }

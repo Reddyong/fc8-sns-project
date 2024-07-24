@@ -29,4 +29,17 @@ public class PostService {
 
         return PostDto.from(savedPost);
     }
+
+    @Transactional
+    public PostDto update(String title, String body, String username, Long postId) {
+        // user find
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+
+        // post exist
+
+        // post permission
+
+        return null;
+    }
 }
