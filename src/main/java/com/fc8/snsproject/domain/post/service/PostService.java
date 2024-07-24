@@ -37,9 +37,18 @@ public class PostService {
                 () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
 
         // post exist
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
+        );
 
         // post permission
+        if (post.getUser() != user) {
+            throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission to Post %s", username, postId));
+        }
 
-        return null;
+        post.setTitle(title);
+        post.setBody(body);
+
+        return PostDto.from(post);
     }
 }
