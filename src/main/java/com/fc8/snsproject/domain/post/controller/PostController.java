@@ -5,9 +5,12 @@ import com.fc8.snsproject.domain.post.dto.PostDto;
 import com.fc8.snsproject.domain.post.dto.request.PostCreateRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostModifyRequest;
 import com.fc8.snsproject.domain.post.dto.response.PostCreateResponse;
+import com.fc8.snsproject.domain.post.dto.response.PostFeedResponse;
 import com.fc8.snsproject.domain.post.dto.response.PostModifyResponse;
 import com.fc8.snsproject.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +53,25 @@ public class PostController {
         postService.delete(postId, userDetails.getUsername());
 
         return Response.success("delete success");
+    }
+
+    @GetMapping(path = "")
+    public Response<Page<PostFeedResponse>> findAll(
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Page<PostDto> postDtoPage = postService.findAll(pageable);
+
+        return Response.success(postDtoPage.map(PostFeedResponse::from));
+    }
+
+    @GetMapping(path = "/my")
+    public Response<Page<PostFeedResponse>> findAllMyPosts(
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Page<PostDto> allMyPosts = postService.findAllMyPosts(pageable, userDetails.getUsername());
+
+        return Response.success(allMyPosts.map(PostFeedResponse::from));
     }
 }

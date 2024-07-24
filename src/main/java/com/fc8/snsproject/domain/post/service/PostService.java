@@ -8,8 +8,12 @@ import com.fc8.snsproject.domain.user.entity.User;
 import com.fc8.snsproject.domain.user.repository.UserRepository;
 import com.fc8.snsproject.exception.SnsApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -69,5 +73,22 @@ public class PostService {
         }
 
         postRepository.deleteById(postId);
+    }
+
+    public Page<PostDto> findAll(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+
+        return posts.map(PostDto::from);
+    }
+
+    public Page<PostDto> findAllMyPosts(Pageable pageable, String username) {
+        // user find
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+
+        // find my posts
+        Page<Post> posts = postRepository.findAllByUser(pageable, user);
+
+        return posts.map(PostDto::from);
     }
 }
