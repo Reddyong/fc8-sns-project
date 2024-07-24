@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -209,6 +210,74 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName(value = "포스트 전체 조회 성공")
+    @WithMockUser
+    @Test
+    void givenNothing_whenGettingAllPosts_thenReturnsOkResponse() throws Exception {
+        // given
+
+        // when
+        when(postService.findAll(any())).thenReturn(Page.empty());
+
+        // then
+        mockMvc.perform(get("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName(value = "포스트 전체 조회 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    @Test
+    void givenNoneLoginUser_whenGettingAllPosts_thenReturnsUnAuthorizedResponse() throws Exception {
+        // given
+
+        // when
+        when(postService.findAll(any())).thenReturn(Page.empty());
+
+        // then
+        mockMvc.perform(get("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "내 피드 목록 조회 성공")
+    @WithMockUser
+    @Test
+    void givenNothing_whenGettingMyPosts_thenReturnsOkResponse() throws Exception {
+        // given
+
+        // when
+        when(postService.findAllMyPosts(any(), anyString())).thenReturn(Page.empty());
+
+        // then
+        mockMvc.perform(get("/api/v1/posts/my")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName(value = "내 피드 목록 조회 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    @Test
+    void given_when_then() throws Exception {
+        // given
+
+        // when
+        when(postService.findAllMyPosts(any(), anyString())).thenReturn(Page.empty());
+
+        // then
+        mockMvc.perform(get("/api/v1/posts/my")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
 
     }
 
