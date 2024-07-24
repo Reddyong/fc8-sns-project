@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -189,5 +191,35 @@ public class PostServiceTest {
         SnsApplicationException snsApplicationException = assertThrows(SnsApplicationException.class, () -> postService.delete(postId, username));
         assertEquals(ErrorCode.POST_NOT_FOUND, snsApplicationException.getErrorCode());
 
+    }
+
+    @DisplayName(value = "포스트 전체 조회 성공")
+    @Test
+    void givenPageable_whenFindAllPosts_thenFindAllSuccess() {
+        // given
+        Pageable pageable = mock(Pageable.class);
+
+        // when
+        when(postRepository.findAll(pageable)).thenReturn(Page.empty());
+
+        // then
+        assertDoesNotThrow(() -> postService.findAll(pageable));
+
+    }
+
+    @DisplayName(value = "내 포스트 목록 조회 성공")
+    @Test
+    void givenPageableAndUsername_whenFindingMyPosts_thenFindMyPostsSuccess() {
+        // given
+        Pageable pageable = mock(Pageable.class);
+        String username = "user";
+        User user = UserEntityFixture.get(1L, username, "");
+
+        // when
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(postRepository.findAllByUser(pageable, user)).thenReturn(Page.empty());
+
+        // then
+        assertDoesNotThrow(() -> postService.findAllMyPosts(pageable, username));
     }
 }
