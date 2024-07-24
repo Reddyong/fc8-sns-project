@@ -5,8 +5,8 @@ import com.fc8.snsproject.domain.user.entity.User;
 
 public class PostEntityFixture {
 
-    public static Post get(Long id, String username) {
-        User user = User.of(1L, username, "");
+    public static Post get(Long id, Long userId, String username) {
+        User user = User.of(userId, username, "");
 
         return Post.of(id, user, "title", "body");
     }

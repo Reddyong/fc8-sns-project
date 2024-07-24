@@ -81,7 +81,7 @@ public class PostServiceTest {
         String body = "body";
         String username = "test";
         Long postId = 1L;
-        Post post = PostEntityFixture.get(postId, username);
+        Post post = PostEntityFixture.get(postId, 1L, username);
         User user = post.getUser();
 
         // when
@@ -101,7 +101,7 @@ public class PostServiceTest {
         String body = "body";
         String username = "hong";
         Long postId = 1L;
-        Post post = PostEntityFixture.get(postId, username);
+        Post post = PostEntityFixture.get(postId, 1L, username);
         User user = post.getUser();
 
         // when
@@ -122,7 +122,7 @@ public class PostServiceTest {
         String body = "body";
         String username = "hong";
         Long postId = 1L;
-        Post post = PostEntityFixture.get(postId, username);
+        Post post = PostEntityFixture.get(postId, 1L, username);
         User wrongUser = UserEntityFixture.get(2L, "kim", "");
 
         // when
