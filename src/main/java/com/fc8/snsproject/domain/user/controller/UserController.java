@@ -24,7 +24,7 @@ public class UserController {
     public Response<UserJoinResponse> join(
             @RequestBody UserJoinRequest userJoinRequest
     ) {
-        UserDto userDto = userService.join(userJoinRequest.username(), userJoinRequest.password());
+        UserDto userDto = userService.join(userJoinRequest.name(), userJoinRequest.password());
         UserJoinResponse userJoinResponse = UserJoinResponse.from(userDto);
 
         return Response.success(userJoinResponse);
@@ -34,7 +34,7 @@ public class UserController {
     public Response<UserLoginResponse> login(
             @RequestBody UserLoginRequest userLoginRequest
     ) {
-        String token = userService.login(userLoginRequest.username(), userLoginRequest.password());
+        String token = userService.login(userLoginRequest.name(), userLoginRequest.password());
 
         return Response.success(UserLoginResponse.of(token));
     }

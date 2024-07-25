@@ -1,7 +1,7 @@
 package com.fc8.snsproject.domain.user.dto.request;
 
 public record UserJoinRequest(
-        String username,
+        String name,
         String password
 ) {
 
