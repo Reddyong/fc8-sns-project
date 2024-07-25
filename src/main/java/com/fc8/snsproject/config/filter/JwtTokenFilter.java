@@ -1,7 +1,6 @@
 package com.fc8.snsproject.config.filter;
 
 import com.fc8.snsproject.domain.user.dto.UserDto;
-import com.fc8.snsproject.domain.user.entity.User;
 import com.fc8.snsproject.domain.user.service.UserService;
 import com.fc8.snsproject.util.JwtTokenUtils;
 import jakarta.servlet.FilterChain;
@@ -10,16 +9,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,7 +32,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header == null || !header.startsWith("Bearer ")) {
-            log.error("Error occurs while getting header, header is null or invalid");
+            log.error("Error occurs while getting header, header is null or invalid {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }

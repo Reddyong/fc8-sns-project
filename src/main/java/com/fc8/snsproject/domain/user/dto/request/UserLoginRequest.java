@@ -1,7 +1,7 @@
 package com.fc8.snsproject.domain.user.dto.request;
 
 public record UserLoginRequest(
-        String name,
+        String username,
         String password
 ) {
 
