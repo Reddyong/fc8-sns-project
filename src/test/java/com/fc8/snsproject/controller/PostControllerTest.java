@@ -267,7 +267,7 @@ public class PostControllerTest {
     @DisplayName(value = "내 피드 목록 조회 실패 - 로그인 하지 않은 경우")
     @WithAnonymousUser
     @Test
-    void given_when_then() throws Exception {
+    void givenNothing_whenFindingMyPosts_thenReturnsUnauthorizedResponse() throws Exception {
         // given
 
         // when
@@ -278,6 +278,55 @@ public class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "좋아요 기능 성공")
+    @WithMockUser
+    @Test
+    void givenNothing_whenLikingPosts_thenReturnsOkResponse() throws Exception {
+        // given
+
+        // when
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName(value = "좋아요 기능 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    @Test
+    void givenNoting_whenLikingPostsWithNoLogin_thenReturnsUnAuthorizedResponse() throws Exception {
+        // given
+
+        // when
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "좋아요 기능 실패 - 좋아요 누를 게시물이 존재하지 않는 경우")
+    @WithMockUser
+    @Test
+    void given_when_then() throws Exception {
+        // given
+
+        // when
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).like(anyLong(), anyString());
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/likes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isNotFound());
 
     }
 

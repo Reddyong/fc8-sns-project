@@ -91,4 +91,9 @@ public class PostService {
 
         return posts.map(PostDto::from);
     }
+
+    @Transactional
+    public void like(Long postId, String username) {
+
+    }
 }
