@@ -1,6 +1,8 @@
 package com.fc8.snsproject.service;
 
 import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.like.entity.Like;
+import com.fc8.snsproject.domain.like.repository.LikeRepository;
 import com.fc8.snsproject.domain.post.dto.PostDto;
 import com.fc8.snsproject.domain.post.entity.Post;
 import com.fc8.snsproject.domain.post.repository.PostRepository;
@@ -37,6 +39,9 @@ public class PostServiceTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private LikeRepository likeRepository;
 
     @DisplayName(value = "포스트 작성 성공")
     @Test
@@ -221,5 +226,44 @@ public class PostServiceTest {
 
         // then
         assertDoesNotThrow(() -> postService.findAllMyPosts(pageable, username));
+    }
+
+    @DisplayName(value = "좋아요 성공")
+    @Test
+    void givenUserInfoAndPostInfo_whenLikingPost_thenLikesPost() {
+        // given
+        Long postId = 1L;
+        String username = "user";
+        User user = User.of(1L, username, "");
+        Post post = Post.of(postId, user, "title", "body");
+
+        // when
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(likeRepository.findByUserAndPost(user, post)).thenReturn(Optional.empty());
+
+        // then
+        assertDoesNotThrow(() -> postService.like(postId, username));
+    }
+
+    @DisplayName(value = "좋아요 실패 - 이미 좋아요를 누른 경우")
+    @Test
+    void givenUserInfoAndAlreadyLikedPost_whenLikingPost_thenFailedLikesPost() {
+        // given
+        Long postId = 1L;
+        String username = "user";
+        User user = User.of(1L, username, "");
+        Post post = Post.of(postId, user, "title", "body");
+        Like like = Like.of(user, post);
+
+        // when
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(likeRepository.findByUserAndPost(user, post)).thenReturn(Optional.of(like));
+
+        // then
+        SnsApplicationException snsApplicationException = assertThrows(SnsApplicationException.class, () -> postService.like(postId, username));
+        assertEquals(ErrorCode.ALREADY_LIKED, snsApplicationException.getErrorCode());
+
     }
 }
