@@ -74,4 +74,24 @@ public class PostController {
 
         return Response.success(allMyPosts.map(PostFeedResponse::from));
     }
+
+    @PostMapping(path = "/{post-id}/likes")
+    public Response<String> like(
+            @PathVariable(name = "post-id") Long postId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        postService.like(postId, userDetails.getUsername());
+
+        return Response.success("like success");
+    }
+
+    @GetMapping(path = "/{post-id}/likes")
+    public Response<Integer> likeCount(
+            @PathVariable(name = "post-id") Long postId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Integer likeCount = postService.getLikeCount(postId);
+
+        return Response.success(likeCount);
+    }
 }
