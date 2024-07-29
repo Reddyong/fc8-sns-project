@@ -317,7 +317,7 @@ public class PostControllerTest {
     @DisplayName(value = "좋아요 기능 실패 - 좋아요 누를 게시물이 존재하지 않는 경우")
     @WithMockUser
     @Test
-    void given_when_then() throws Exception {
+    void givenNothing_whenLikingPostsWithNoneExistingPost_thenReturnsNotFoundResponse() throws Exception {
         // given
 
         // when

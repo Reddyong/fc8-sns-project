@@ -8,9 +8,12 @@ import com.fc8.snsproject.exception.SnsApplicationException;
 import com.fc8.snsproject.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.awt.print.Pageable;
 
 @RequiredArgsConstructor
 @Service
@@ -60,4 +63,9 @@ public class UserService {
         );
     }
 
+    // TODO : alarm return
+    public Page<Void> alarmList(String username, Pageable pageable) {
+
+        return Page.empty();
+    }
 }
