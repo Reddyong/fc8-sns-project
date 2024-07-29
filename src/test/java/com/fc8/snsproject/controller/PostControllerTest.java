@@ -372,7 +372,7 @@ public class PostControllerTest {
         // given
 
         // when
-        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(anyLong(), anyString());
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(anyLong(), anyString(), anyString());
 
         // then
         mockMvc.perform(post("/api/v1/posts/1/comments")
