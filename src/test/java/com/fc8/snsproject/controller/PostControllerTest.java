@@ -3,6 +3,7 @@ package com.fc8.snsproject.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fc8.snsproject.common.ErrorCode;
 import com.fc8.snsproject.domain.post.dto.PostDto;
+import com.fc8.snsproject.domain.post.dto.request.PostCommentRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostCreateRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostModifyRequest;
 import com.fc8.snsproject.domain.post.entity.Post;
@@ -325,6 +326,58 @@ public class PostControllerTest {
         // then
         mockMvc.perform(post("/api/v1/posts/1/likes")
                         .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
+
+    @DisplayName(value = "댓글 기능 성공")
+    @WithMockUser
+    @Test
+    void givenCommentInfo_whenPostingComment_thenReturnsOkResponse() throws Exception {
+        // given
+
+        // when
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(PostCommentRequest.of("comment")))
+                ).andDo(print())
+                .andExpect(status().isOk());
+
+    }
+
+    @DisplayName(value = "댓글 기능 실패 - 로그인 하지 않은 경우")
+    @WithAnonymousUser
+    @Test
+    void givenCommentInfo_whenPostingCommentWithNotLogin_thenReturnsUnAuthorizedResponse() throws Exception {
+        // given
+
+        // when
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(PostCommentRequest.of("comment")))
+                ).andDo(print())
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @DisplayName(value = "댓글 기능 실패 - 게시글이 존재하지 않는 경우")
+    @WithMockUser
+    @Test
+    void givenCommentInfoAndNoneExistingPost_whenPostingComment_thenReturnsNotFoundResponse() throws Exception {
+        // given
+
+        // when
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(anyLong(), anyString());
+
+        // then
+        mockMvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(PostCommentRequest.of("comment")))
                 ).andDo(print())
                 .andExpect(status().isNotFound());
 

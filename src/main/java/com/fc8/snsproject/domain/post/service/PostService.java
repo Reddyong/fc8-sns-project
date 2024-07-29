@@ -125,4 +125,9 @@ public class PostService {
         return likeRepository.countByPost(post);
 
     }
+
+    @Transactional
+    public void comment(Long postId, String username) {
+
+    }
 }
