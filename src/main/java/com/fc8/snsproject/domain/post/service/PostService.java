@@ -1,6 +1,9 @@
 package com.fc8.snsproject.domain.post.service;
 
 import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.comment.dto.CommentDto;
+import com.fc8.snsproject.domain.comment.entity.Comment;
+import com.fc8.snsproject.domain.comment.repository.CommentRepository;
 import com.fc8.snsproject.domain.like.entity.Like;
 import com.fc8.snsproject.domain.like.repository.LikeRepository;
 import com.fc8.snsproject.domain.post.dto.PostDto;
@@ -24,12 +27,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public PostDto create(String title, String body, String username) {
         // user find
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+        User user = getUserOrException(username);
 
         // post save
         Post savedPost = postRepository.save(Post.of(user, title, body));
@@ -40,13 +43,10 @@ public class PostService {
     @Transactional
     public PostDto update(String title, String body, String username, Long postId) {
         // user find
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+        User user = getUserOrException(username);
 
         // post exist
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
-        );
+        Post post = getPostOrException(postId);
 
         // post permission
         if (post.getUser() != user) {
@@ -62,13 +62,10 @@ public class PostService {
     @Transactional
     public void delete(Long postId, String username) {
         // user find
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+        User user = getUserOrException(username);
 
         // post exist
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
-        );
+        Post post = getPostOrException(postId);
 
         // post permission
         if (!post.getUser().getId().equals(user.getId())) {
@@ -86,8 +83,7 @@ public class PostService {
 
     public Page<PostDto> findAllMyPosts(Pageable pageable, String username) {
         // user find
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+        User user = getUserOrException(username);
 
         // find my posts
         Page<Post> posts = postRepository.findAllByUser(pageable, user);
@@ -98,13 +94,10 @@ public class PostService {
     @Transactional
     public void like(Long postId, String username) {
         // user find
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
+        User user = getUserOrException(username);
 
         // post exist
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
-        );
+        Post post = getPostOrException(postId);
 
         // check like
         likeRepository.findByUserAndPost(user, post).ifPresent(it -> {
@@ -117,9 +110,7 @@ public class PostService {
 
     public int getLikeCount(Long postId) {
         // post exist
-        Post post = postRepository.findById(postId).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
-        );
+        Post post = getPostOrException(postId);
 
         // count like
         return likeRepository.countByPost(post);
@@ -127,7 +118,36 @@ public class PostService {
     }
 
     @Transactional
-    public void comment(Long postId, String username) {
+    public void comment(Long postId, String username, String content) {
+        // user find
+        User user = getUserOrException(username);
 
+        // post exist
+        Post post = getPostOrException(postId);
+
+        // comment save
+        Comment comment = Comment.of(user, post, content);
+        commentRepository.save(comment);
+
+    }
+
+    public Page<CommentDto> getComments(Long postId, Pageable pageable) {
+        // post exist
+        Post post = getPostOrException(postId);
+
+        Page<Comment> commentPage = commentRepository.findAllByPost(post, pageable);
+
+        return commentPage.map(CommentDto::from);
+    }
+
+    private Post getPostOrException(Long postId) {
+        return postRepository.findById(postId).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("Post %s Not Founded", postId))
+        );
+    }
+
+    private User getUserOrException(String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s Not Founded", username)));
     }
 }

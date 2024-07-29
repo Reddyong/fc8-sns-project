@@ -1,7 +1,10 @@
 package com.fc8.snsproject.domain.post.controller;
 
 import com.fc8.snsproject.common.Response;
+import com.fc8.snsproject.domain.comment.dto.CommentDto;
+import com.fc8.snsproject.domain.comment.dto.response.CommentResponse;
 import com.fc8.snsproject.domain.post.dto.PostDto;
+import com.fc8.snsproject.domain.post.dto.request.PostCommentRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostCreateRequest;
 import com.fc8.snsproject.domain.post.dto.request.PostModifyRequest;
 import com.fc8.snsproject.domain.post.dto.response.PostCreateResponse;
@@ -93,5 +96,28 @@ public class PostController {
         Integer likeCount = postService.getLikeCount(postId);
 
         return Response.success(likeCount);
+    }
+
+    @PostMapping(path = "/{post-id}/comments")
+    public Response<String> postComment(
+            @PathVariable(name = "post-id") Long postId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody PostCommentRequest postCommentRequest
+    ) {
+        postService.comment(postId, userDetails.getUsername(), postCommentRequest.content());
+
+        return Response.success("post success : " + postCommentRequest.content());
+    }
+
+    @GetMapping(path = "/{post-id}/comments")
+    public Response<Page<CommentResponse>> getComments(
+            @PathVariable(name = "post-id") Long postId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable
+    ) {
+        Page<CommentDto> comments = postService.getComments(postId, pageable);
+        Page<CommentResponse> commentResponses = comments.map(CommentResponse::from);
+
+        return Response.success(commentResponses);
     }
 }
