@@ -1,6 +1,8 @@
 package com.fc8.snsproject.domain.user.controller;
 
 import com.fc8.snsproject.common.Response;
+import com.fc8.snsproject.domain.alarm.dto.AlarmDto;
+import com.fc8.snsproject.domain.alarm.dto.response.AlarmResponse;
 import com.fc8.snsproject.domain.user.dto.UserDto;
 import com.fc8.snsproject.domain.user.dto.request.UserJoinRequest;
 import com.fc8.snsproject.domain.user.dto.request.UserLoginRequest;
@@ -8,10 +10,11 @@ import com.fc8.snsproject.domain.user.dto.response.UserJoinResponse;
 import com.fc8.snsproject.domain.user.dto.response.UserLoginResponse;
 import com.fc8.snsproject.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/users")
@@ -37,5 +40,16 @@ public class UserController {
         String token = userService.login(userLoginRequest.username(), userLoginRequest.password());
 
         return Response.success(UserLoginResponse.of(token));
+    }
+
+    @GetMapping(path = "/alarms")
+    public Response<Page<AlarmResponse>> alarm(
+            Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Page<AlarmDto> alarmDtoPage = userService.alarmList(userDetails.getUsername(), pageable);
+        Page<AlarmResponse> alarmResponsePage = alarmDtoPage.map(AlarmResponse::from);
+
+        return Response.success(alarmResponsePage);
     }
 }
