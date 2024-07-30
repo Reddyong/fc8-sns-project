@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 
 public record AlarmDto(
         Long id,
-        UserDto userDto,
         AlarmType alarmType,
         AlarmArgs alarmArgs,
         Timestamp registeredAt,
@@ -18,14 +17,13 @@ public record AlarmDto(
         Timestamp deletedAt
 ) {
 
-    public static AlarmDto of(Long id, UserDto userDto, AlarmType alarmType, AlarmArgs alarmArgs, Timestamp registeredAt, Timestamp updatedAt, Timestamp deletedAt) {
-        return new AlarmDto(id, userDto, alarmType, alarmArgs, registeredAt, updatedAt, deletedAt);
+    public static AlarmDto of(Long id, AlarmType alarmType, AlarmArgs alarmArgs, Timestamp registeredAt, Timestamp updatedAt, Timestamp deletedAt) {
+        return new AlarmDto(id, alarmType, alarmArgs, registeredAt, updatedAt, deletedAt);
     }
 
     public static AlarmDto from(Alarm alarm) {
         return AlarmDto.of(
                 alarm.getId(),
-                UserDto.from(alarm.getUser()),
                 alarm.getAlarmType(),
                 alarm.getArgs(),
                 alarm.getRegisteredAt(),

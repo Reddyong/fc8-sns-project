@@ -77,6 +77,9 @@ public class PostService {
             throw new SnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("%s has no permission to Post %s", username, postId));
         }
 
+        likeRepository.deleteAllByPost(post);
+        commentRepository.deleteAllByPost(post);
+
         postRepository.deleteById(postId);
     }
 
@@ -115,7 +118,7 @@ public class PostService {
         alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getId(), post.getId())));
     }
 
-    public int getLikeCount(Long postId) {
+    public Long getLikeCount(Long postId) {
         // post exist
         Post post = getPostOrException(postId);
 

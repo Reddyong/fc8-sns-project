@@ -137,7 +137,7 @@ public class UserControllerTest {
         // given
 
         // when
-        when(userService.alarmList(anyString(), any())).thenReturn(Page.empty());
+        when(userService.alarmList(any(), any())).thenReturn(Page.empty());
 
         // then
         mockMvc.perform(get("/api/v1/users/alarms")
