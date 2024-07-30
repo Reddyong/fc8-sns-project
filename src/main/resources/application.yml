@@ -16,6 +16,11 @@ spring:
     password: reddyong1234!@#$
     driver-class-name: org.postgresql.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 
 jwt:
   secret.key: fastcampus.sns-project-2024.secret_key.myReddyongSecretKey!@#$1234

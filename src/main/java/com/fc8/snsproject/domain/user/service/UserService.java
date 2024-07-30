@@ -6,10 +6,12 @@ import com.fc8.snsproject.domain.alarm.entity.Alarm;
 import com.fc8.snsproject.domain.alarm.repository.AlarmRepository;
 import com.fc8.snsproject.domain.user.dto.UserDto;
 import com.fc8.snsproject.domain.user.entity.User;
+import com.fc8.snsproject.domain.user.repository.UserRedisRepository;
 import com.fc8.snsproject.domain.user.repository.UserRepository;
 import com.fc8.snsproject.exception.SnsApplicationException;
 import com.fc8.snsproject.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -24,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRedisRepository userRedisRepository;
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -48,11 +52,11 @@ public class UserService {
 
     public String login(String username, String password) {
         // 회원가입 여부 체크
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", username)));
+        UserDto userDto = loadByUsername(username);
+        userRedisRepository.setUser(userDto);
 
         // 비밀번호 체크
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(password, userDto.password())) {
             throw new SnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
@@ -61,9 +65,9 @@ public class UserService {
     }
 
     public UserDto loadByUsername(String username) {
-        return userRepository.findByUsername(username).map(UserDto::from).orElseThrow(
+        return userRedisRepository.getUser(username).orElseGet(() -> userRepository.findByUsername(username).map(UserDto::from).orElseThrow(
                 () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", username))
-        );
+        ));
     }
 
     public Page<AlarmDto> alarmList(Long userId, Pageable pageable) {
