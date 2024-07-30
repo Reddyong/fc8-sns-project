@@ -66,12 +66,9 @@ public class UserService {
         );
     }
 
-    public Page<AlarmDto> alarmList(String username, Pageable pageable) {
-        // 회원가입 여부 체크
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not founded", username)));
+    public Page<AlarmDto> alarmList(Long userId, Pageable pageable) {
 
-        Page<Alarm> alarmPage = alarmRepository.findAllByUser(user, pageable);
+        Page<Alarm> alarmPage = alarmRepository.findAllByUserId(userId, pageable);
 
         return alarmPage.map(AlarmDto::from);
     }

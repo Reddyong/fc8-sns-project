@@ -45,9 +45,9 @@ public class UserController {
     @GetMapping(path = "/alarms")
     public Response<Page<AlarmResponse>> alarm(
             Pageable pageable,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDto userDto
     ) {
-        Page<AlarmDto> alarmDtoPage = userService.alarmList(userDetails.getUsername(), pageable);
+        Page<AlarmDto> alarmDtoPage = userService.alarmList(userDto.id(), pageable);
         Page<AlarmResponse> alarmResponsePage = alarmDtoPage.map(AlarmResponse::from);
 
         return Response.success(alarmResponsePage);
