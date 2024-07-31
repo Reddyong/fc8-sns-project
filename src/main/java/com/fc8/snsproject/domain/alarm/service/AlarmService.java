@@ -1,7 +1,13 @@
 package com.fc8.snsproject.domain.alarm.service;
 
 import com.fc8.snsproject.common.ErrorCode;
+import com.fc8.snsproject.domain.alarm.entity.Alarm;
+import com.fc8.snsproject.domain.alarm.entity.AlarmArgs;
+import com.fc8.snsproject.domain.alarm.entity.enums.AlarmType;
+import com.fc8.snsproject.domain.alarm.repository.AlarmRepository;
 import com.fc8.snsproject.domain.alarm.repository.EmitterRepository;
+import com.fc8.snsproject.domain.user.entity.User;
+import com.fc8.snsproject.domain.user.repository.UserRepository;
 import com.fc8.snsproject.exception.SnsApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +25,22 @@ public class AlarmService {
     private static final String ALARM_NAME = "alarm";
 
     private final EmitterRepository emitterRepository;
+    private final AlarmRepository alarmRepository;
+    private final UserRepository userRepository;
 
-    public void send(Long alarmId, Long userId) {
-        emitterRepository.get(userId).ifPresentOrElse(sseEmitter -> {
+    public void send(AlarmType alarmType, Long receiverId, AlarmArgs args) {
+
+        User user = userRepository.findById(receiverId).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        Alarm alarm = alarmRepository.save(Alarm.of(user, alarmType, args));
+
+        emitterRepository.get(receiverId).ifPresentOrElse(sseEmitter -> {
             try {
-                sseEmitter.send(SseEmitter.event().id(alarmId.toString()).name(ALARM_NAME).data("new alarm"));
+                sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME).data("new alarm"));
             } catch (IOException e) {
-                emitterRepository.delete(userId);
+                emitterRepository.delete(receiverId);
                 throw new SnsApplicationException(ErrorCode.ALARM_CONNECT_ERROR);
             }
         }, () -> log.info("No Emitter Founded"));
