@@ -3,6 +3,7 @@ package com.fc8.snsproject.domain.user.controller;
 import com.fc8.snsproject.common.Response;
 import com.fc8.snsproject.domain.alarm.dto.AlarmDto;
 import com.fc8.snsproject.domain.alarm.dto.response.AlarmResponse;
+import com.fc8.snsproject.domain.alarm.service.AlarmService;
 import com.fc8.snsproject.domain.user.dto.UserDto;
 import com.fc8.snsproject.domain.user.dto.request.UserJoinRequest;
 import com.fc8.snsproject.domain.user.dto.request.UserLoginRequest;
@@ -13,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/users")
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final AlarmService alarmService;
 
     @PostMapping(path = "/join")
     public Response<UserJoinResponse> join(
@@ -51,5 +53,12 @@ public class UserController {
         Page<AlarmResponse> alarmResponsePage = alarmDtoPage.map(AlarmResponse::from);
 
         return Response.success(alarmResponsePage);
+    }
+
+    @GetMapping(path = "/alarms/subscribe")
+    public SseEmitter subscribe(
+            @AuthenticationPrincipal UserDto userDto
+    ) {
+        return alarmService.connectAlarm(userDto.id());
     }
 }

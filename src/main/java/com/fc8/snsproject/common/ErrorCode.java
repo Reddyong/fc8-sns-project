@@ -21,7 +21,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Token is invalid"),
 
 
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Erro")
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+
+    ALARM_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connecting Alarm Occurs Error")
     ;
 
     private HttpStatus status;

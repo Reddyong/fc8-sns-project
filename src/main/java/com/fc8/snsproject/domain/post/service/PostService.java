@@ -5,6 +5,7 @@ import com.fc8.snsproject.domain.alarm.entity.Alarm;
 import com.fc8.snsproject.domain.alarm.entity.AlarmArgs;
 import com.fc8.snsproject.domain.alarm.entity.enums.AlarmType;
 import com.fc8.snsproject.domain.alarm.repository.AlarmRepository;
+import com.fc8.snsproject.domain.alarm.service.AlarmService;
 import com.fc8.snsproject.domain.comment.dto.CommentDto;
 import com.fc8.snsproject.domain.comment.entity.Comment;
 import com.fc8.snsproject.domain.comment.repository.CommentRepository;
@@ -33,6 +34,8 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final AlarmRepository alarmRepository;
+
+    private final AlarmService alarmService;
 
     @Transactional
     public PostDto create(String title, String body, String username) {
@@ -115,7 +118,8 @@ public class PostService {
         // like save
         likeRepository.save(Like.of(user, post));
 
-        alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getId(), post.getId())));
+        Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(user.getId(), post.getId())));
+        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public Long getLikeCount(Long postId) {
@@ -139,8 +143,8 @@ public class PostService {
         Comment comment = Comment.of(user, post, content);
         commentRepository.save(comment);
 
-        alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getId(), post.getId())));
-
+        Alarm alarm = alarmRepository.save(Alarm.of(post.getUser(), AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(user.getId(), post.getId())));
+        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public Page<CommentDto> getComments(Long postId, Pageable pageable) {
