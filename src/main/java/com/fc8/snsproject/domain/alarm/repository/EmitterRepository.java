@@ -25,7 +25,7 @@ public class EmitterRepository {
     public Optional<SseEmitter> get(Long userId) {
         final String key = getKey(userId);
         log.info("Get sseEmitter {}", userId);
-        return Optional.of(emitterMap.get(key));
+        return Optional.ofNullable(emitterMap.get(key));
     }
 
     public void delete(Long userId) {
